@@ -229,19 +229,22 @@ def check_exists_by_class_name(class_name):
 
 def parse_date(date_str):
     """Парсит дату вакансии"""
-    day = int(date_str.split("\xa0")[0])
-    month_str = date_str.split("\xa0")[1]
-    a = datetime.date.today()
-    month_dict = {"января": 1, "февраля": 2, "марта": 3, "апреля": 4, "мая": 5, "июня": 6, "июля": 7, "августа": 8,
-                  "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12}
-    if month_str in month_dict.keys():
-        month = month_dict[month_str]
-    else:
-        month = a.month
-    year = a.year
-    if month > a.month:
-        year -= 1
-    return datetime.date(year, month, day).isoformat()
+    try:
+        day = int(date_str.split("\xa0")[0])
+        month_str = date_str.split("\xa0")[1]
+        a = datetime.date.today()
+        month_dict = {"января": 1, "февраля": 2, "марта": 3, "апреля": 4, "мая": 5, "июня": 6, "июля": 7, "августа": 8,
+                      "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12}
+        if month_str in month_dict.keys():
+            month = month_dict[month_str]
+        else:
+            month = a.month
+        year = a.year
+        if month > a.month:
+            year -= 1
+        return datetime.date(year, month, day).isoformat()
+    except IndexError:
+        return None
 
 
 if __name__ == '__main__':
