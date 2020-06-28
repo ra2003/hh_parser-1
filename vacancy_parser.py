@@ -26,10 +26,12 @@
 """
 
 import sys
+import datetime
+import locale
+import io
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium.webdriver.support.ui import WebDriverWait
-import datetime
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -75,7 +77,14 @@ def parse_vacancies_on_page(page):
         vacancy_links.append(vacancy_link)
 
         # Id вакансии на сайте hh
-        vacancy_hh_id = vacancy_link.split('/')[4].split("?")[0]
+        if len(vacancy_link) == 0:
+            vacancy_hh_id = None
+        else:
+            try:
+                vacancy_hh_id = vacancy_link.split('/')[4].split("?")[0]
+            except IndexError:
+                vacancy_hh_id = None
+
         vacancy_hh_ids.append(vacancy_hh_id)
 
         vacancy_salary_block = vacancy.find("div", {"class": "vacancy-serp-item__sidebar"})
@@ -236,6 +245,7 @@ def parse_date(date_str):
 
 
 if __name__ == '__main__':
+    locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
     options = webdriver.ChromeOptions()
     options.add_argument('headless')  # Невидимый режим браузера
     options.add_argument('--log-level=1')  # Не выводит логи браузера в командную строку
@@ -279,9 +289,9 @@ if __name__ == '__main__':
         print("Глубокий парсинг: Done\n")
 
     # Запись в файл
-    file = open(file_name, 'w')
-    for vacancy in all_vacancies:
-        file.write(str(vacancy))
-        file.write("\n")
+    with io.open(file_name, "w", encoding="utf-8") as f:
+        for vacancy in all_vacancies:
+            f.write(str(vacancy))
+            f.write("\n")
 
     print("Получено " + str(len(all_vacancies)) + " Вакансий")
